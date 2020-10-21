@@ -1,0 +1,102 @@
+<canvas id="gc" width="400" height="400"></canvas>
+<script>
+    window.onload=function()
+    {
+        canv=document.getElementById("gc");
+        ctx=canv.getContext("2d");
+        document.addEventListener("keydown", keyPush);
+        setInterval(game, 1000/15);
+    }
+
+    px=py=10;
+    gs=tc=20;
+    ax=ay=15;
+    xv=yv=0;
+    trail = [];
+    tail = 5;
+    function game()
+    {
+        //Change player position by velocity each frame
+        px+=xv;
+        py+=yv;
+
+        //Wrap around
+        if(px<0)
+        {
+            px = tc-1;
+        }
+        if(px>tc-1)
+        {
+            px = 0;
+        }
+        if(py<0)
+        {
+            py = tc-1;
+        }
+        if(py> tc-1)
+        {
+            py = 0;
+        }
+
+        //Set backgroud tp black
+        ctx.fillStyle="black";
+        ctx.fillRect(0, 0, canv.width, canv.height);
+
+        //Snake body is lime
+        ctx.fillStyle = "lime";
+        //For every block of the snakes body
+        for(var i = 0; i < trail.length; i++)
+        {
+            //Fill a lime rectangle at its position
+            ctx.fillRect(trail[i].x*gs, trail[i].y*gs, gs-2, gs-2);
+            //If the player position overlaps with any of the tail positions, rest the snake's length to 5
+            if(trail[i].x == px && trail[i].y == py)
+            {
+                tail = 5;
+            }
+        }
+
+        //Every frame add the players position to the end of the snake array. Add a new head, pop the old tail.
+        trail.push({x:px,y:py});
+        //If the snake is longer than it should be (because we just pushed a new element to it) pop the first element (the tail) off the array
+        while(trail.length > tail)
+        {
+            trail.shift();
+        }
+
+        //If the player is overlapping with an apple, reset the apple and make the snake longer
+        if(ax == px && ay == py)
+        {
+            tail ++;
+            ax = Math.floor(Math.random() * tc);
+            ay = Math.floor(Math.random() * tc);
+        }
+        //Apple color
+        ctx.fillStyle = "red";
+        ctx.fillRect(ax*gs, ay*gs, gs - 2, gs - 2)
+    }
+
+    //Controls with arrow keys
+    function keyPush(evt)
+    {
+        switch(evt.keyCode)
+        {
+            case 37:
+                xv=-1;
+                yv=0;
+                break;
+            case 38:
+                xv=0
+                yv=-1;
+                break;
+            case 39:
+                xv=1;
+                yv=0;
+                break;
+            case 40:
+                xv=0;
+                yv=1;
+                break;
+        }
+    }
+</script>
